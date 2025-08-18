@@ -8,6 +8,7 @@ import { PreviewPanel } from "@/components/preview-panel"
 import { AIAgentPanel } from "@/components/ai-agent-panel"
 import { Toolbar } from "@/components/toolbar"
 import { ResizablePanel } from "@/components/resizable-panel"
+import AuthComponent from "@/components/auth/auth-dialog"
 
 export interface FileContent {
   name: string
@@ -58,6 +59,7 @@ export default function CodeEditorPage() {
         showAIAgent={showAIAgent}
         setShowAIAgent={setShowAIAgent}
       />
+      <AuthComponent />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - File Explorer */}
