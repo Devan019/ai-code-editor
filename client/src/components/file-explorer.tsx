@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { FileText, Folder } from "lucide-react"
 import type { FileContent } from "@/app/page"
+import axios from "axios"
 
 interface FileExplorerProps {
   files: FileContent[]
@@ -25,6 +26,13 @@ const getFileIcon = (fileName: string) => {
 }
 
 export function FileExplorer({ files, activeFile, onFileSelect }: FileExplorerProps) {
+
+
+  async function getfiles() {
+    const api = await axios.post("/api/files");
+    
+  }
+
   return (
     <div className="h-full bg-[#252526] border-r border-[#3e3e42] flex flex-col">
       <div className="h-8 bg-[#2d2d30] border-b border-[#3e3e42] flex items-center px-3">

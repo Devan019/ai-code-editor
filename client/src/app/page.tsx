@@ -9,6 +9,7 @@ import { AIAgentPanel } from "@/components/ai-agent-panel"
 import { Toolbar } from "@/components/toolbar"
 import { ResizablePanel } from "@/components/resizable-panel"
 import AuthComponent from "@/components/auth/auth-dialog"
+import axios from "axios"
 
 export interface FileContent {
   name: string
