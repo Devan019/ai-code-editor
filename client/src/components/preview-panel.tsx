@@ -26,7 +26,6 @@ export function PreviewPanel({ files }: PreviewPanelProps) {
     const cssFile = files.find((f) => f.name === "style.css")
     const jsFile = files.find((f) => f.name === "script.js")
 
-    console.log(htmlFile, cssFile, jsFile )
 
     if (!htmlFile) return
 

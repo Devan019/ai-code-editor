@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { FileExplorer } from "@/components/file-explorer"
 import { CodeEditor } from "@/components/code-editor"
@@ -10,6 +10,7 @@ import { Toolbar } from "@/components/toolbar"
 import { ResizablePanel } from "@/components/resizable-panel"
 import AuthComponent from "@/components/auth/auth-dialog"
 import axios from "axios"
+import { useSession } from "next-auth/react"
 
 export interface FileContent {
   name: string
@@ -17,32 +18,24 @@ export interface FileContent {
   language: string
 }
 
-const initialFiles: FileContent[] = [
-  {
-    name: "index.html",
-    content: ``,
-    language: "html",
-  },
-  {
-    name: "style.css",
-    content: ``,
-    language: "css",
-  },
-  {
-    name: "script.js",
-    content: ``,
-    language: "javascript",
-  },
-]
+export interface DFile {
+  id: string
+  name: string
+  mimeType: string
+  size: string
+}
+
+
 
 export default function CodeEditorPage() {
 
-  const [files, setFiles] = useState<FileContent[]>(initialFiles)
-  const [activeFile, setActiveFile] = useState<string>("index.html")
+  const [files, setFiles] = useState<DFile[]>([])
+  const [activeFile, setActiveFile] = useState<string>("")
   const [showPreview, setShowPreview] = useState(false)
   const [showAIAgent, setShowAIAgent] = useState(false)
   const [leftPanelWidth, setLeftPanelWidth] = useState(300)
   const [rightPanelWidth, setRightPanelWidth] = useState(400)
+  const [fileContent, setFileContent] = useState<FileContent>()
 
   const updateFileContent = (fileName: string, content: string) => {
     setFiles((prev) => prev.map((file) => (file.name === fileName ? { ...file, content } : file)))
@@ -65,23 +58,23 @@ export default function CodeEditorPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - File Explorer */}
         <ResizablePanel width={leftPanelWidth} onResize={setLeftPanelWidth} minWidth={200} maxWidth={500} side="right">
-          <FileExplorer files={files} activeFile={activeFile} onFileSelect={setActiveFile} />
+          <FileExplorer setFiles={setFiles} files={files} activeFile={activeFile} onFileSelect={setActiveFile} />
         </ResizablePanel>
 
         {/* Main Content Area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Code Editor */}
           <div className="flex-1 overflow-hidden">
-            <CodeEditor
+            {/* <CodeEditor
               file={getActiveFileContent()}
               onContentChange={(content) => updateFileContent(activeFile, content)}
-            />
+            /> */}
           </div>
 
           {/* Right Panels */}
           <div className="flex">
             {/* Preview Panel */}
-            <AnimatePresence>
+            {/* <AnimatePresence>
               {showPreview && (
                 <motion.div
                   initial={{ width: 0, opacity: 0 }}
@@ -101,10 +94,10 @@ export default function CodeEditorPage() {
                   </ResizablePanel>
                 </motion.div>
               )}
-            </AnimatePresence>
+            </AnimatePresence> */}
 
             {/* AI Agent Panel */}
-            <AnimatePresence>
+            {/* <AnimatePresence>
               {showAIAgent && (
                 <motion.div
                   initial={{ width: 0, opacity: 0 }}
@@ -119,7 +112,7 @@ export default function CodeEditorPage() {
                   />
                 </motion.div>
               )}
-            </AnimatePresence>
+            </AnimatePresence> */}
           </div>
         </div>
       </div>

@@ -14,13 +14,14 @@ const AuthComponent = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   async function FolderCheck() {
-    const api = await axios.post("/api/dfolder", {
+    const api = await axios.post("/api/drive/dfolder", {
       accessToken: session?.accessToken,
+      folderName: "ai-editor"
     });
 
     const data = api.data;
 
-    if(data.folderId){
+    if (data.folderId) {
       localStorage.setItem("folderId", data.folderId);
     }
   }
@@ -38,8 +39,8 @@ const AuthComponent = () => {
     }
   }, [status]);
 
-  useEffect(()=>{
-    if(session?.user){
+  useEffect(() => {
+    if (session?.user) {
       FolderCheck()
     }
   }, [session])
@@ -84,21 +85,29 @@ const AuthComponent = () => {
 
       {!session?.user && (
         <Dialog open={openLoginDialog}>
-          <div className="p-6 max-w-sm">
-            <h2 className="text-xl font-bold mb-4">Login Required</h2>
-            <p className="mb-6">You need to sign in to access this feature.</p>
-            <div className="flex justify-center">
-              <Button
-                variant="destructive"
-                onClick={handleLogin}
-                className="bg-white text-gray-800 hover:bg-gray-100"
-              >
-                Sign in with Google
-              </Button>
+          {/* Backdrop */}
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            {/* Dialog Card */}
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-xl max-w-sm mx-4 transition-colors">
+              <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+                Login Required
+              </h2>
+              <p className="mb-6 text-gray-600 dark:text-gray-300">
+                You need to sign in to access this feature.
+              </p>
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleLogin}
+                  className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600"
+                >
+                  Sign in with Google
+                </Button>
+              </div>
             </div>
           </div>
         </Dialog>
       )}
+
     </div>
   );
 };

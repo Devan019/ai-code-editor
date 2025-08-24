@@ -17,7 +17,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "devicon": "^2.17.0",
-    "googleapis": "^156.0.0",
     "lucide-react": "^0.539.0",
     "motion": "^12.23.12",
     "next": "15.4.6",
