@@ -8,7 +8,7 @@ import { Dialog } from "../ui/dialog";
 import { Button } from "../ui/button";
 import axios from "axios";
 
-const AuthComponent = () => {
+const AuthComponent = ({ apiKeys, setApiKeys } : { apiKeys: any, setApiKeys: (keys: any) => void }) => {
   const { data: session, status } = useSession();
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +26,20 @@ const AuthComponent = () => {
     }
   }
 
+  async function apiKeyCheck() {
+    const api = await axios.post("/api/api-key/get", {
+      userId: session?.user.id
+    });
+    const data = api.data;
+
+    setApiKeys({
+      groq: data.groq || '',
+      gemini: data.gemini || '',
+      openai: data.openai || '',
+      anthropic: data.anthropic || ''
+    })
+  }
+
   useEffect(() => {
     if (status !== "loading") {
       setIsLoading(false);
@@ -41,7 +55,11 @@ const AuthComponent = () => {
 
   useEffect(() => {
     if (session?.user) {
-      FolderCheck()
+      async function main() {
+        await apiKeyCheck();
+        await FolderCheck();
+      }
+      main()
     }
   }, [session])
 

@@ -97,3 +97,374 @@ for (const [ext, mime] of Object.entries(extensionToMime)) {
     mimeToExtension[mime] = ext;
   }
 }
+
+
+export  const extensionToLanguage = {
+  txt: "Plain Text",
+  html: "HTML",
+  htm: "HTML",
+  css: "CSS",
+  scss: "SCSS",
+  less: "LESS",
+
+  js: "JavaScript",
+  jsx: "JavaScript (React JSX)",
+  mjs: "JavaScript (ES Modules)",
+  cjs: "JavaScript (CommonJS)",
+
+  ts: "TypeScript",
+  tsx: "TypeScript (React TSX)",
+
+  json: "JSON",
+  xml: "XML",
+  md: "Markdown",
+  markdown: "Markdown",
+
+  py: "Python",
+  php: "PHP",
+  java: "Java",
+  c: "C",
+  cpp: "C++",
+  cc: "C++",
+  h: "C/C++ Header",
+  hpp: "C++ Header",
+
+  cs: "C#",
+  rb: "Ruby",
+  go: "Go",
+  rs: "Rust",
+  swift: "Swift",
+  kt: "Kotlin",
+  kts: "Kotlin Script",
+
+  m: "Objective-C",
+
+  sh: "Shell Script",
+  bash: "Bash",
+  zsh: "Zsh",
+  fish: "Fish Shell",
+
+  ps1: "PowerShell",
+  bat: "Batch File",
+  cmd: "Command Script",
+
+  yml: "YAML",
+  yaml: "YAML",
+  toml: "TOML",
+  ini: "INI",
+  cfg: "Configuration",
+  conf: "Configuration",
+  config: "Configuration",
+
+  log: "Log File",
+  csv: "CSV",
+  tsv: "TSV",
+  sql: "SQL",
+
+  graphql: "GraphQL",
+  gql: "GraphQL",
+
+  vue: "Vue.js",
+  svelte: "Svelte",
+
+  dockerfile: "Dockerfile",
+  env: "Environment Variables",
+  gitignore: "Git Ignore File",
+  editorconfig: "EditorConfig"
+};
+
+export const languageToExtensions = {
+  "Plain Text": ["txt"],
+
+  HTML: ["html", "htm"],
+  CSS: ["css"],
+  SCSS: ["scss"],
+  LESS: ["less"],
+
+  JavaScript: ["js"],
+  "JavaScript (React JSX)": ["jsx"],
+  "JavaScript (ES Modules)": ["mjs"],
+  "JavaScript (CommonJS)": ["cjs"],
+
+  TypeScript: ["ts"],
+  "TypeScript (React TSX)": ["tsx"],
+
+  JSON: ["json"],
+  XML: ["xml"],
+  Markdown: ["md", "markdown"],
+
+  Python: ["py"],
+  PHP: ["php"],
+  Java: ["java"],
+  C: ["c"],
+  "C++": ["cpp", "cc"],
+  "C/C++ Header": ["h"],
+  "C++ Header": ["hpp"],
+
+  "C#": ["cs"],
+  Ruby: ["rb"],
+  Go: ["go"],
+  Rust: ["rs"],
+  Swift: ["swift"],
+  Kotlin: ["kt", "kts"],
+
+  "Objective-C": ["m"],
+
+  "Shell Script": ["sh"],
+  Bash: ["bash"],
+  Zsh: ["zsh"],
+  "Fish Shell": ["fish"],
+
+  PowerShell: ["ps1"],
+  "Batch File": ["bat"],
+  "Command Script": ["cmd"],
+
+  YAML: ["yml", "yaml"],
+  TOML: ["toml"],
+  INI: ["ini"],
+  Configuration: ["cfg", "conf", "config"],
+
+  "Log File": ["log"],
+  CSV: ["csv"],
+  TSV: ["tsv"],
+  SQL: ["sql"],
+
+  GraphQL: ["graphql", "gql"],
+
+  "Vue.js": ["vue"],
+  Svelte: ["svelte"],
+
+  Dockerfile: ["dockerfile"],
+  "Environment Variables": ["env"],
+  "Git Ignore File": ["gitignore"],
+  EditorConfig: ["editorconfig"]
+};
+
+export const languageToJDoodleConfig = {
+  "python": {
+    name: "Python",
+    versions: {
+      "3": "python3",
+      "2": "python2"
+    },
+    defaultVersion: "3"
+  },
+  "java": {
+    name: "Java",
+    versions: {
+      "4": "java",
+      "3": "java",
+      "2": "java",
+      "1": "java"
+    },
+    defaultVersion: "5"
+  },
+  "c": {
+    name: "C",
+    versions: {
+      "5": "c",
+      "4": "c"
+    },
+    defaultVersion: "4"
+  },
+  "cpp": {
+    name: "C++",
+    versions: {
+      "5": "cpp",
+      "4": "cpp14",
+      "3": "cpp"
+    },
+    defaultVersion: "4"
+  },
+  "csharp": {
+    name: "C#",
+    versions: {
+      "3": "csharp",
+      "2": "csharp"
+    },
+    defaultVersion: "3"
+  },
+  "php": {
+    name: "PHP",
+    versions: {
+      "3": "php",
+      "2": "php"
+    },
+    defaultVersion: "3"
+  },
+  "ruby": {
+    name: "Ruby",
+    versions: {
+      "3": "ruby",
+      "2": "ruby"
+    },
+    defaultVersion: "3"
+  },
+  "go": {
+    name: "Go",
+    versions: {
+      "4": "go",
+      "3": "go"
+    },
+    defaultVersion: "4"
+  },
+  "scala": {
+    name: "Scala",
+    versions: {
+      "4": "scala",
+      "3": "scala"
+    },
+    defaultVersion: "4"
+  },
+  "bash": {
+    name: "Bash",
+    versions: {
+      "1": "bash"
+    },
+    defaultVersion: "1"
+  },
+  "sql": {
+    name: "SQL",
+    versions: {
+      "3": "mysql",
+      "2": "mysql"
+    },
+    defaultVersion: "3"
+  },
+  "javascript": {
+    name: "JavaScript",
+    versions: {
+      "4": "nodejs",
+      "3": "nodejs"
+    },
+    defaultVersion: "4"
+  },
+  "typescript": {
+    name: "TypeScript",
+    versions: {
+      "1": "typescript"
+    },
+    defaultVersion: "1"
+  },
+  "perl": {
+    name: "Perl",
+    versions: {
+      "3": "perl",
+      "2": "perl"
+    },
+    defaultVersion: "3"
+  },
+  "rust": {
+    name: "Rust",
+    versions: {
+      "4": "rust",
+      "3": "rust"
+    },
+    defaultVersion: "4"
+  },
+  "swift": {
+    name: "Swift",
+    versions: {
+      "4": "swift",
+      "3": "swift"
+    },
+    defaultVersion: "4"
+  },
+  "kotlin": {
+    name: "Kotlin",
+    versions: {
+      "3": "kotlin",
+      "2": "kotlin"
+    },
+    defaultVersion: "3"
+  },
+  "lua": {
+    name: "Lua",
+    versions: {
+      "2": "lua"
+    },
+    defaultVersion: "2"
+  },
+  "r": {
+    name: "R",
+    versions: {
+      "4": "r",
+      "3": "r"
+    },
+    defaultVersion: "4"
+  },
+  "dart": {
+    name: "Dart",
+    versions: {
+      "2": "dart"
+    },
+    defaultVersion: "2"
+  },
+  "haskell": {
+    name: "Haskell",
+    versions: {
+      "2": "haskell"
+    },
+    defaultVersion: "2"
+  },
+  "elixir": {
+    name: "Elixir",
+    versions: {
+      "1": "elixir"
+    },
+    defaultVersion: "1"
+  },
+  "erlang": {
+    name: "Erlang",
+    versions: {
+      "2": "erlang"
+    },
+    defaultVersion: "2"
+  },
+  "clojure": {
+    name: "Clojure",
+    versions: {
+      "3": "clojure",
+      "2": "clojure"
+    },
+    defaultVersion: "3"
+  },
+  "fsharp": {
+    name: "F#",
+    versions: {
+      "3": "fsharp",
+      "2": "fsharp"
+    },
+    defaultVersion: "3"
+  },
+  "groovy": {
+    name: "Groovy",
+    versions: {
+      "3": "groovy",
+      "2": "groovy"
+    },
+    defaultVersion: "3"
+  },
+  "objective-c": {
+    name: "Objective-C",
+    versions: {
+      "2": "objc"
+    },
+    defaultVersion: "2"
+  },
+  "pascal": {
+    name: "Pascal",
+    versions: {
+      "3": "pascal",
+      "2": "pascal"
+    },
+    defaultVersion: "3"
+  },
+  "vb.net": {
+    name: "VB.NET",
+    versions: {
+      "2": "vbn"
+    },
+    defaultVersion: "2"
+  }
+};

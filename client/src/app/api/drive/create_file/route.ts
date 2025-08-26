@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(req:NextRequest){
   try {
     const {accessToken, fileName, mimeType, folderId} =  await req.json();
+    console.log(accessToken, fileName, mimeType, folderId)
     if(!accessToken || !fileName || !mimeType || !folderId){
       return new Response("Missing required fields", {status:400});
     }
@@ -23,6 +24,7 @@ export async function POST(req:NextRequest){
     return NextResponse.json(data);
 
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error: "Failed to create file" }, { status: 500 });
   }
 }

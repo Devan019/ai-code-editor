@@ -4,8 +4,8 @@ import type React from "react"
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Send, Bot, User, Sparkles } from "lucide-react"
-import { FileContent } from "@/app/page"
+import { Send, Bot, User, Sparkles, Play, Terminal } from "lucide-react"
+import { DFile, FileContent } from "@/app/page"
 import axios from "axios"
 
 interface Message {
@@ -15,18 +15,76 @@ interface Message {
   timestamp: Date
 }
 
+interface ModelSelectorProps {
+  groq: string;
+  gemini: string;
+  openai: string;
+  anthropic: string;
+}
 
+interface ExecutionResult {
+  output: string | null;
+  error: string | null;
+  statusCode: number;
+  memory: string;
+  cpuTime: string;
+  compilationStatus: string | null;
+  projectKey: string | null;
+  isExecutionSuccess: boolean;
+  isCompiled: boolean;
+}
 
-export function AIAgentPanel({files, setFiles}:{
-  files : FileContent[]
-  setFiles: React.Dispatch<React.SetStateAction<FileContent[]>>
+import { models } from "@/lib/models";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { useSession } from "next-auth/react"
+import { getExtension } from "./file-explorer"
+import { extensionToLanguage, extensionToMime, languageToJDoodleConfig } from "@/lib/mapper"
+
+export function AIAgentPanel({ files, setFiles, apiKeys, activeFile, setActiveFile, fileContent, setFileContent }: {
+  files: DFile[]
+  setFiles: React.Dispatch<React.SetStateAction<DFile[]>>
+  apiKeys: ModelSelectorProps
+  activeFile: DFile | undefined
+  setActiveFile: React.Dispatch<React.SetStateAction<DFile | undefined>>
+  fileContent: FileContent | undefined
+  setFileContent: React.Dispatch<React.SetStateAction<FileContent | undefined>>
 }) {
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedLabel, setSelectedLabel] = useState<string>('')
+  const { data: session } = useSession();
+  const [showTerminal, setShowTerminal] = useState<boolean>(false);
+  const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
+
+  // Get available models based on API keys
+  const availableModels = () => {
+    const result: { provider: string, model: string }[] = [];
+
+    if (apiKeys.groq) {
+      models.groq.forEach(model => result.push({ provider: 'groq', model }));
+    }
+
+    if (apiKeys.gemini) {
+      models.google.forEach(model => result.push({ provider: 'google', model }));
+    }
+
+    if (apiKeys.openai) {
+      models.openai.forEach(model => result.push({ provider: 'openai', model }));
+    }
+
+    if (apiKeys.anthropic) {
+      models.anthropic.forEach(model => result.push({ provider: 'anthropic', model }));
+    }
+
+    return result;
+  };
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       content:
-        "Hello! I'm your AI coding assistant. I can help you with HTML, CSS, JavaScript, and more. What would you like to work on?",
+        "Hello! I'm your AI coding assistant.",
       sender: "ai",
       timestamp: new Date(),
     },
@@ -48,45 +106,102 @@ export function AIAgentPanel({files, setFiles}:{
     setInputValue("")
     setIsTyping(true)
 
-    // Simulate AI response
-
-    let code = "";
-    files.map((file) => {
-      code += `// ${file.name}\n${file.content}\n\n`;
-    })
-
-    const api = await axios.post("/api/gemini", {
-      prompt : inputValue, code 
-    })
-
-    const data = api.data;
-    console.log(data)
-
-    setFiles((prev) =>
-      prev.map((file, index) => {
-        if(index == 0){
-          return { ...file, content: data.html }
-        }else if(index == 1){
-          return { ...file, content: data.css }
-        }else{
-          return {...file, content: data.js }
-        }
+    // AI response
+    try {
+      const api = await axios.post(`/api/ai/${selectedLabel}`, {
+        prompt: inputValue,
+        userId: session?.user?.id,
+        model: selectedModel,
       })
-    )
 
+      const data = api.data;
+
+      const { response } = data;
+      const { filename, code } = response;
+
+      //make a new file
+      const newfileApi = await axios.post("/api/drive/create_file", {
+        accessToken: session?.accessToken,
+        fileName: filename,
+        mimeType: extensionToMime[getExtension(filename)],
+        folderId: localStorage.getItem("folderId")
+      })
+
+      // fileId, accessToken, code, mimeType
+      //upload code
+      const uploadapi = await axios.post("/api/save/drive", {
+        accessToken: session?.accessToken,
+        fileId: newfileApi.data.id,
+        code: code,
+        mimeType:  extensionToMime[getExtension(filename)],
+      })
+
+      console.log("at upload", uploadapi.data)
+
+      //all files
+      const filesapi = await axios.post("/api/drive/files", {
+        accessToken: session?.accessToken,
+        folderId: localStorage.getItem("folderId")
+      })
+      const setfiledata = filesapi.data;
+
+      //setfiles
+      setFiles(setfiledata)
+
+      //activefile
+      setActiveFile((prev) => {
+        return {
+          id: newfileApi.data.id,
+          name: filename,
+          mimeType:  extensionToMime[getExtension(filename)],
+          size: uploadapi.data.size,
+        };
+      })
+
+      //set code
+      setFileContent((prev) => ({
+        name: filename,
+        language: extensionToLanguage[getExtension(filename) as keyof typeof extensionToLanguage] || 'plaintext',
+        content: code
+      }));
+
+    } catch (error) {
+      setIsTyping(false);
+    }
     setIsTyping(false);
-
   }
 
-  const getAIResponse = (input: string): string => {
-    const responses = [
-      "I can help you with that! Let me suggest some improvements to your code.",
-      "Great question! Here's what I recommend for your project.",
-      "I see what you're trying to do. Let me provide some guidance.",
-      "That's an interesting approach! Here are some alternatives you might consider.",
-      "I can help optimize that code for better performance and readability.",
-    ]
-    return responses[Math.floor(Math.random() * responses.length)]
+  const handleRunCode = async () => {
+    if (!fileContent) return;
+    
+    setIsExecuting(true);
+    setShowTerminal(true);
+    
+    try {
+      
+      const response = await axios.post("/api/run", {
+        code: fileContent.content,
+        language: fileContent.language,
+        versionIndex: languageToJDoodleConfig[fileContent.language.toLowerCase() as keyof typeof languageToJDoodleConfig].defaultVersion
+      });
+      
+      setExecutionResult(response.data);
+    } catch (error) {
+      console.error("Execution error:", error);
+      setExecutionResult({
+        output: null,
+        error: "Failed to execute code",
+        statusCode: 500,
+        memory: "0",
+        cpuTime: "0",
+        compilationStatus: null,
+        projectKey: null,
+        isExecutionSuccess: false,
+        isCompiled: false
+      });
+    } finally {
+      setIsExecuting(false);
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -117,14 +232,12 @@ export function AIAgentPanel({files, setFiles}:{
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`flex items-start space-x-2 max-w-[80%] ${
-                  message.sender === "user" ? "flex-row-reverse space-x-reverse" : ""
-                }`}
+                className={`flex items-start space-x-2 max-w-[80%] ${message.sender === "user" ? "flex-row-reverse space-x-reverse" : ""
+                  }`}
               >
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                    message.sender === "user" ? "bg-[#007acc]" : "bg-gradient-to-r from-purple-500 to-pink-500"
-                  }`}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center ${message.sender === "user" ? "bg-[#007acc]" : "bg-gradient-to-r from-purple-500 to-pink-500"
+                    }`}
                 >
                   {message.sender === "user" ? (
                     <User className="w-3 h-3 text-white" />
@@ -133,9 +246,8 @@ export function AIAgentPanel({files, setFiles}:{
                   )}
                 </div>
                 <div
-                  className={`rounded-lg p-3 text-sm ${
-                    message.sender === "user" ? "bg-[#007acc] text-white" : "bg-[#3c3c3c] text-gray-200"
-                  }`}
+                  className={`rounded-lg p-3 text-sm ${message.sender === "user" ? "bg-[#007acc] text-white" : "bg-[#3c3c3c] text-gray-200"
+                    }`}
                 >
                   {message.content}
                 </div>
@@ -181,6 +293,34 @@ export function AIAgentPanel({files, setFiles}:{
           )}
         </AnimatePresence>
       </div>
+
+      {/* Model Selector */}
+      <div className="p-2 border-t border-[#3e3e42]">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="w-full px-3 py-2 rounded-md bg-[#3c3c3c] text-gray-200 text-sm flex items-center justify-between">
+            {selectedModel || 'Select Model'}
+            <span className="text-xs opacity-70">▼</span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-64 bg-[#3c3c3c] border border-[#4c4c4c]">
+            <DropdownMenuLabel className="text-gray-200">Models</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-[#4c4c4c]" />
+            {availableModels().map((modelObj, idx) => (
+              <div key={idx}>
+                <DropdownMenuItem 
+                  className="text-gray-200 hover:bg-[#4c4c4c] cursor-pointer"
+                  onClick={() => { setSelectedModel(modelObj.model); setSelectedLabel(modelObj.provider) }} 
+                  key={modelObj.model}
+                >
+                  {modelObj.model}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-[#4c4c4c]" />
+              </div>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      
 
       {/* Input */}
       <div className="p-3 border-t border-[#3e3e42]">

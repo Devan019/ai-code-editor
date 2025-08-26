@@ -30,45 +30,61 @@ export interface DFile {
 export default function CodeEditorPage() {
 
   const [files, setFiles] = useState<DFile[]>([])
-  const [activeFile, setActiveFile] = useState<string>("")
+  const [activeFile, setActiveFile] = useState<DFile>()
   const [showPreview, setShowPreview] = useState(false)
   const [showAIAgent, setShowAIAgent] = useState(false)
   const [leftPanelWidth, setLeftPanelWidth] = useState(300)
   const [rightPanelWidth, setRightPanelWidth] = useState(400)
   const [fileContent, setFileContent] = useState<FileContent>()
-
+  const [apiKeys, setApiKeys] = useState({
+    groq: '',
+    gemini: '',
+    openai: '',
+    anthropic: ''
+  });
   const updateFileContent = (fileName: string, content: string) => {
     setFiles((prev) => prev.map((file) => (file.name === fileName ? { ...file, content } : file)))
   }
 
-  const getActiveFileContent = () => {
-    return files.find((file) => file.name === activeFile)
-  }
+
 
   return (
     <div className="h-screen bg-[#1e1e1e] text-white flex flex-col overflow-hidden">
       <Toolbar
+        apiKeys={apiKeys}
+        setApiKeys={setApiKeys}
         showPreview={showPreview}
         setShowPreview={setShowPreview}
         showAIAgent={showAIAgent}
         setShowAIAgent={setShowAIAgent}
       />
-      <AuthComponent />
+      <AuthComponent apiKeys={apiKeys} setApiKeys={setApiKeys} />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - File Explorer */}
         <ResizablePanel width={leftPanelWidth} onResize={setLeftPanelWidth} minWidth={200} maxWidth={500} side="right">
-          <FileExplorer setFiles={setFiles} files={files} activeFile={activeFile} onFileSelect={setActiveFile} />
+          <FileExplorer setFileContent={setFileContent} setFiles={setFiles} files={files} activeFile={activeFile ?? {
+            id: "",
+            mimeType: "",
+            name: "",
+            size: "",
+          }} onFileSelect={setActiveFile} />
         </ResizablePanel>
 
         {/* Main Content Area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Code Editor */}
           <div className="flex-1 overflow-hidden">
-            {/* <CodeEditor
-              file={getActiveFileContent()}
-              onContentChange={(content) => updateFileContent(activeFile, content)}
-            /> */}
+            <CodeEditor
+              Dfile={activeFile ?? {
+                id: "",
+                mimeType: "",
+                name: "",
+                size: "",
+              }}
+              file={fileContent}
+              onContentChange={(content) => updateFileContent(activeFile?.name ?? "", content)}
+            />
           </div>
 
           {/* Right Panels */}
@@ -97,7 +113,7 @@ export default function CodeEditorPage() {
             </AnimatePresence> */}
 
             {/* AI Agent Panel */}
-            {/* <AnimatePresence>
+            <AnimatePresence>
               {showAIAgent && (
                 <motion.div
                   initial={{ width: 0, opacity: 0 }}
@@ -109,10 +125,15 @@ export default function CodeEditorPage() {
                   <AIAgentPanel
                     files={files}
                     setFiles={setFiles}
+                    apiKeys={apiKeys}
+                    activeFile={activeFile}
+                    fileContent = {fileContent}
+                    setActiveFile={setActiveFile}
+                    setFileContent={setFileContent}
                   />
                 </motion.div>
               )}
-            </AnimatePresence> */}
+            </AnimatePresence>
           </div>
         </div>
       </div>

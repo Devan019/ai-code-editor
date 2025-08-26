@@ -1,22 +1,24 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { FileText, Folder, Plus, RefreshCw } from "lucide-react"
-import type { DFile } from "@/app/page"
+import { Download, FileText, Folder, MoreVertical, Plus, RefreshCw, Trash2 } from "lucide-react"
+import type { DFile, FileContent } from "@/app/page"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { extensionToMime } from "@/lib/mapper"
+import { extensionToLanguage, extensionToMime } from "@/lib/mapper"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 interface FileExplorerProps {
   files: DFile[]
-  activeFile: string
-  onFileSelect: (fileName: string) => void
+  activeFile: DFile | null
+  onFileSelect: (file: DFile) => void
   setFiles: (files: DFile[]) => void
+  setFileContent: (fileContent: FileContent) => void
 }
 
-const getExtension = (fileName: string) => {
-  return fileName.split(".").pop()
+export const getExtension = (fileName: string) => {
+  return (fileName.split(".").pop() ?? "")
 }
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return "0 Bytes"
@@ -26,7 +28,7 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
 }
 
-export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: FileExplorerProps) {
+export function FileExplorer({ files, activeFile, onFileSelect, setFiles, setFileContent }: FileExplorerProps) {
 
   const { data: session, status } = useSession()
   // const [files, setFiles] = useState<FileContent[]>([])
@@ -47,7 +49,7 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
         return
       }
 
-      const mimeType = extensionToMime[getExtension(newFileName)?? ""]
+      const mimeType = extensionToMime[getExtension(newFileName) ?? ""]
 
       const response = await axios.post("/api/drive/create_file", {
         accessToken: session.accessToken,
@@ -57,7 +59,7 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
       })
 
       // Add the new file to our list
-      console.log(response)
+      setFiles([response.data, ...files])
       setNewFileName("")
       setShowAddFile(false)
     } catch (err: any) {
@@ -97,21 +99,22 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
   }
 
   async function selectFile(file: DFile) {
-    onFileSelect(file.name)
+    onFileSelect(file)
     const api = await axios.post("/api/drive/get-content", {
       accessToken: session?.accessToken,
       fileId: file.id,
       mimeType: file.mimeType
     })
     const data = api.data;
-    console.log(data.fileContent)
+    const extension = getExtension(file.name) ?? "";
+    setFileContent({
+      name: file.name,
+      content: data.fileContent,
+      language: extension in extensionToLanguage
+        ? extensionToLanguage[extension as keyof typeof extensionToLanguage]
+        : "Unknown"
+    })
   }
-
-  useEffect(()=>{
-    if(session?.user){
-      getFiles()
-    }
-  },[session?.user])
 
   return (
     <div className="h-full bg-[#252526] border-r border-[#3e3e42] flex flex-col">
@@ -184,8 +187,16 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
 
           <div className="ml-2 space-y-1">
             {files?.length === 0 && !loading ? (
-              <div className="text-xs text-gray-500 italic py-2">
-                No files found in this folder
+              <div className="text-xs text-gray-500 italic py-2 flex items-center justify-center">
+                <div>Refresh</div>
+                <button
+                  onClick={getFiles}
+                  disabled={loading}
+                  className="p-1 text-gray-400 hover:text-white disabled:opacity-50"
+                  title="Refresh files"
+                >
+                  <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
+                </button>
               </div>
             ) : (
               files?.map((file) => (
@@ -193,8 +204,8 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
                   key={file.id}
                   whileHover={{ backgroundColor: "#2a2d2e" }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() =>  selectFile(file)}
-                  className={`flex items-center px-2 py-1 rounded cursor-pointer text-sm transition-colors ${activeFile === file.id ? "bg-[#37373d] text-white" : "text-gray-300 hover:text-white"}`}
+                  onClick={() => selectFile(file)}
+                  className={`flex items-center px-2 py-1 rounded cursor-pointer text-sm transition-colors ${activeFile?.id === file.id ? "bg-[#37373d] text-white" : "text-gray-300 hover:text-white"}`}
                 >
                   {/* <span className="mr-2 text-base">{getFileIcon(file.mimeType, file.name)}</span> */}
                   <FileText className="w-3 h-3 mr-2" />
@@ -204,6 +215,70 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
                       {formatFileSize(parseInt(file.size))}
                     </span>
                   )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        onClick={(e) => e.stopPropagation()} // prevent file selection
+                        className="ml-2 p-1 rounded hover:bg-[#444] text-gray-400 hover:text-white"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-[#2a2d2e] text-white">
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+
+                          try {
+                            const accessToken = session?.accessToken;
+                            const fileId = file.id;
+
+                            const res = await axios.get(
+                              `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${accessToken}`,
+                                },
+                                responseType: "blob", // important for file downloads
+                              }
+                            );
+
+                            // Create download link
+                            const url = window.URL.createObjectURL(new Blob([res.data]));
+                            const link = document.createElement("a");
+                            link.href = url;
+                            link.setAttribute("download", file.name); // or some default name
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+
+                            window.URL.revokeObjectURL(url);
+                          } catch (err) {
+                            console.error("Download failed:", err);
+                          }
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await axios.post("/api/drive/delete-file", {
+                            fileId: file.id,
+                            accessToken: session?.accessToken,
+                          })
+                          setFiles(files.filter(f => f.id !== file.id));
+                        }}
+                        className="flex items-center gap-2 text-red-400 focus:text-red-500"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </motion.div>
               ))
             )}
@@ -216,6 +291,6 @@ export function FileExplorer({ files, activeFile, onFileSelect, setFiles }: File
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
