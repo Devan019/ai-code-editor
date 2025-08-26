@@ -257,7 +257,7 @@ export const languageToJDoodleConfig = {
       "2": "java",
       "1": "java"
     },
-    defaultVersion: "5"
+    defaultVersion: "0"
   },
   "c": {
     name: "C",
@@ -265,7 +265,7 @@ export const languageToJDoodleConfig = {
       "5": "c",
       "4": "c"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "cpp": {
     name: "C++",
@@ -274,7 +274,16 @@ export const languageToJDoodleConfig = {
       "4": "cpp14",
       "3": "cpp"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
+  },
+  "c++": {
+    name: "C++",
+    versions: {
+      "5": "cpp",
+      "4": "cpp14",
+      "3": "cpp"
+    },
+    defaultVersion: "0"
   },
   "csharp": {
     name: "C#",
@@ -282,7 +291,7 @@ export const languageToJDoodleConfig = {
       "3": "csharp",
       "2": "csharp"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "php": {
     name: "PHP",
@@ -290,7 +299,7 @@ export const languageToJDoodleConfig = {
       "3": "php",
       "2": "php"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "ruby": {
     name: "Ruby",
@@ -298,7 +307,7 @@ export const languageToJDoodleConfig = {
       "3": "ruby",
       "2": "ruby"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "go": {
     name: "Go",
@@ -306,7 +315,7 @@ export const languageToJDoodleConfig = {
       "4": "go",
       "3": "go"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "scala": {
     name: "Scala",
@@ -314,14 +323,14 @@ export const languageToJDoodleConfig = {
       "4": "scala",
       "3": "scala"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "bash": {
     name: "Bash",
     versions: {
       "1": "bash"
     },
-    defaultVersion: "1"
+    defaultVersion: "0"
   },
   "sql": {
     name: "SQL",
@@ -329,7 +338,7 @@ export const languageToJDoodleConfig = {
       "3": "mysql",
       "2": "mysql"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "javascript": {
     name: "JavaScript",
@@ -337,14 +346,14 @@ export const languageToJDoodleConfig = {
       "4": "nodejs",
       "3": "nodejs"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "typescript": {
     name: "TypeScript",
     versions: {
       "1": "typescript"
     },
-    defaultVersion: "1"
+    defaultVersion: "0"
   },
   "perl": {
     name: "Perl",
@@ -352,7 +361,7 @@ export const languageToJDoodleConfig = {
       "3": "perl",
       "2": "perl"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "rust": {
     name: "Rust",
@@ -360,7 +369,7 @@ export const languageToJDoodleConfig = {
       "4": "rust",
       "3": "rust"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "swift": {
     name: "Swift",
@@ -368,7 +377,7 @@ export const languageToJDoodleConfig = {
       "4": "swift",
       "3": "swift"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "kotlin": {
     name: "Kotlin",
@@ -376,14 +385,14 @@ export const languageToJDoodleConfig = {
       "3": "kotlin",
       "2": "kotlin"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "lua": {
     name: "Lua",
     versions: {
       "2": "lua"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   },
   "r": {
     name: "R",
@@ -391,35 +400,35 @@ export const languageToJDoodleConfig = {
       "4": "r",
       "3": "r"
     },
-    defaultVersion: "4"
+    defaultVersion: "0"
   },
   "dart": {
     name: "Dart",
     versions: {
       "2": "dart"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   },
   "haskell": {
     name: "Haskell",
     versions: {
       "2": "haskell"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   },
   "elixir": {
     name: "Elixir",
     versions: {
       "1": "elixir"
     },
-    defaultVersion: "1"
+    defaultVersion: "0"
   },
   "erlang": {
     name: "Erlang",
     versions: {
       "2": "erlang"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   },
   "clojure": {
     name: "Clojure",
@@ -427,7 +436,7 @@ export const languageToJDoodleConfig = {
       "3": "clojure",
       "2": "clojure"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "fsharp": {
     name: "F#",
@@ -435,7 +444,7 @@ export const languageToJDoodleConfig = {
       "3": "fsharp",
       "2": "fsharp"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "groovy": {
     name: "Groovy",
@@ -443,14 +452,14 @@ export const languageToJDoodleConfig = {
       "3": "groovy",
       "2": "groovy"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "objective-c": {
     name: "Objective-C",
     versions: {
       "2": "objc"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   },
   "pascal": {
     name: "Pascal",
@@ -458,13 +467,13 @@ export const languageToJDoodleConfig = {
       "3": "pascal",
       "2": "pascal"
     },
-    defaultVersion: "3"
+    defaultVersion: "0"
   },
   "vb.net": {
     name: "VB.NET",
     versions: {
       "2": "vbn"
     },
-    defaultVersion: "2"
+    defaultVersion: "0"
   }
 };

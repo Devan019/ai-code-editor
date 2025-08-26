@@ -64,7 +64,7 @@ export function CodeEditor({ file, onContentChange, Dfile }: CodeEditorProps) {
   }, [file])
 
   const handleRunCode = async () => {
-    if (!file?.content) return;
+    if (!code) return;
 
     setIsExecuting(true);
     setShowTerminal(true);
@@ -72,9 +72,9 @@ export function CodeEditor({ file, onContentChange, Dfile }: CodeEditorProps) {
     try {
 
       const response = await axios.post("/api/run", {
-        code: file.content,
-        language: file.language,
-        versionIndex: 0
+        code,
+        language: codelan == "python" ? "python3" : codelan,
+        versionIndex: languageToJDoodleConfig[codelan as keyof typeof languageToJDoodleConfig]?.defaultVersion ?? "0",
       });
 
       setExecutionResult(response.data.response);
@@ -134,7 +134,7 @@ export function CodeEditor({ file, onContentChange, Dfile }: CodeEditorProps) {
 
       {/* Editor Area */}
       <div className="flex-1 relative">
-        <button className="absolute bottom-4 right-4 z-10 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center hover:cursor-pointer"
+        <button className="absolute top-1 right-36 z-10 bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center hover:cursor-pointer"
           onClick={() => {
             const accessToken = session?.accessToken;
             axios.post("/api/save/drive", { fileId: Dfile.id, accessToken, code, mimeType: extensionToMime[getExtension(Dfile.name)] });
@@ -156,7 +156,7 @@ export function CodeEditor({ file, onContentChange, Dfile }: CodeEditorProps) {
 
         {/* Terminal Output */}
         {showTerminal && (
-          <div className="border-t border-[#3e3e42]">
+          <div className=" border-t border-[#3e3e42]">
             <div className="h-8 bg-[#2d2d30] flex items-center px-3">
               <Terminal className="w-4 h-4 mr-2 text-green-400" />
               <span className="text-xs font-medium text-gray-300">TERMINAL</span>

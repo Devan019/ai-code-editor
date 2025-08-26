@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { code, language } = await req.json();
+    const { code, language, versionIndex } = await req.json();
 
-    if (!code || !language) {
+    if (!code || !language || !versionIndex) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       script: code,
       stdin: "",
       language: language.toLowerCase() == "javascript" ? "nodejs" : language.toLowerCase(),
-      versionIndex: "0", // must be string per JDoodle docs
+      versionIndex: versionIndex.toString(), // must be string per JDoodle docs
       compileOnly: false,
     });
 
